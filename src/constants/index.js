@@ -280,7 +280,7 @@ export const workExperiences = [
     id: 3,
     name: 'Montclair University',
     pos: 'Master\'s in Computer Science',
-    duration: '2024 - 2027',
+    duration: '2024 - 2026',
     title: "Pursuing advanced studies in software development, testing methodologies, and computer science fundamentals. Focus on enhancing technical expertise in programming languages, algorithms, and software engineering principles.",
     icon: '/assets/montclair.png',
     animation: 'salute',

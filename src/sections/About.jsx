@@ -80,7 +80,7 @@ const About = () => {
             <div>
               <p className="grid-headtext">Education</p>
               <p className="grid-subtext">
-                <strong>Montclair University (2024–2027)</strong><br/>
+                <strong>Montclair University (2024–2026)</strong><br/>
                 Master's in Computer Science<br/><br/>
                 I'm passionate about advancing my knowledge in software development and testing methodologies. I love solving complex problems through code and continuously improving my technical skills.
               </p>
