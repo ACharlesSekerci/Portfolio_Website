@@ -21,11 +21,8 @@ const Contact = () => {
     to_email: 'met.sekerci@gmail.com' 
   });
 
-  // Debug EmailJS environment variables
   useEffect(() => {
-    console.log('EmailJS Service ID:', import.meta.env.VITE_APP_EMAILJS_SERVICE_ID);
-    console.log('EmailJS Template ID:', import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID);
-    console.log('EmailJS Public Key exists:', !!import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY);
+    console.log('Using hardcoded credentials for testing');
   }, []);
 
   const handleChange = ({ target: { name, value } }) => {
@@ -36,11 +33,25 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Log the form data and EmailJS params
-    console.log('Form data:', form);
-    console.log('Sending email with EmailJS...');
+    // Debug log to see form data
+    console.log('Form data being sent:', {
+      formData: form,
+      formElements: {
+        from_name: formRef.current.from_name.value,
+        from_email: formRef.current.from_email.value,
+        message: formRef.current.message.value,
+        reply_to: formRef.current.from_email.value,
+      }
+    });
 
-    // Using the formRef approach which is more reliable
+    // Add reply_to to the form before sending
+    const formElement = formRef.current;
+    const replyToInput = document.createElement('input');
+    replyToInput.type = 'hidden';
+    replyToInput.name = 'reply_to';
+    replyToInput.value = form.from_email;
+    formElement.appendChild(replyToInput);
+
     emailjs
       .sendForm(
         import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
@@ -51,6 +62,8 @@ const Contact = () => {
       .then(
         (result) => {
           console.log('Email sent successfully:', result);
+          // Remove the temporary reply_to input
+          formElement.removeChild(replyToInput);
           setLoading(false);
           showAlert({
             show: true,
@@ -70,14 +83,9 @@ const Contact = () => {
           }, [3000]);
         },
         (error) => {
-          console.error('EmailJS error details:', {
-            error: error,
-            errorText: error.text,
-            errorType: error.type,
-            formData: form,
-            serviceId: import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
-            templateId: import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID
-          });
+          // Remove the temporary reply_to input in case of error
+          formElement.removeChild(replyToInput);
+          console.error('EmailJS error:', error);
           setLoading(false);
           
           showAlert({
