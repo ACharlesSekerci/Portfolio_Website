@@ -1,8 +1,11 @@
 import emailjs from '@emailjs/browser';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import useAlert from '../hooks/useAlert.js';
 import Alert from '../components/Alert.jsx';
+
+// Initialize EmailJS with the public key
+emailjs.init(import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY);
 
 const Contact = () => {
   const formRef = useRef();
@@ -10,7 +13,20 @@ const Contact = () => {
   const { alert, showAlert, hideAlert } = useAlert();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ 
+    from_name: '', 
+    from_email: '', 
+    message: '',
+    to_name: 'Ahmet Sekerci',
+    to_email: 'met.sekerci@gmail.com' 
+  });
+
+  // Debug EmailJS environment variables
+  useEffect(() => {
+    console.log('EmailJS Service ID:', import.meta.env.VITE_APP_EMAILJS_SERVICE_ID);
+    console.log('EmailJS Template ID:', import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID);
+    console.log('EmailJS Public Key exists:', !!import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY);
+  }, []);
 
   const handleChange = ({ target: { name, value } }) => {
     setForm({ ...form, [name]: value });
@@ -20,21 +36,21 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Log the form data and EmailJS params
+    console.log('Form data:', form);
+    console.log('Sending email with EmailJS...');
+
+    // Using the formRef approach which is more reliable
     emailjs
-      .send(
+      .sendForm(
         import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          to_name: 'Ahmet Sekerci',
-          from_email: form.email,
-          to_email: 'met.sekerci@gmail.com',
-          message: form.message,
-        },
-        import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY,
+        formRef.current,
+        import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY
       )
       .then(
-        () => {
+        (result) => {
+          console.log('Email sent successfully:', result);
           setLoading(false);
           showAlert({
             show: true,
@@ -45,16 +61,18 @@ const Contact = () => {
           setTimeout(() => {
             hideAlert(false);
             setForm({
-              name: '',
-              email: '',
+              from_name: '',
+              from_email: '',
               message: '',
+              to_name: 'Ahmet Sekerci',
+              to_email: 'met.sekerci@gmail.com'
             });
           }, [3000]);
         },
         (error) => {
+          console.error('EmailJS error:', error);
           setLoading(false);
-          console.error(error);
-
+          
           showAlert({
             show: true,
             text: "I didn't receive your message 😢",
@@ -83,8 +101,8 @@ const Contact = () => {
               <span className="field-label">Full Name</span>
               <input
                 type="text"
-                name="name"
-                value={form.name}
+                name="from_name"
+                value={form.from_name}
                 onChange={handleChange}
                 required
                 className="field-input"
@@ -96,8 +114,8 @@ const Contact = () => {
               <span className="field-label">Email address</span>
               <input
                 type="email"
-                name="email"
-                value={form.email}
+                name="from_email"
+                value={form.from_email}
                 onChange={handleChange}
                 required
                 className="field-input"
