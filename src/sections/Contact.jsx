@@ -70,12 +70,19 @@ const Contact = () => {
           }, [3000]);
         },
         (error) => {
-          console.error('EmailJS error:', error);
+          console.error('EmailJS error details:', {
+            error: error,
+            errorText: error.text,
+            errorType: error.type,
+            formData: form,
+            serviceId: import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
+            templateId: import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID
+          });
           setLoading(false);
           
           showAlert({
             show: true,
-            text: "I didn't receive your message 😢",
+            text: `Failed to send message: ${error.text || 'Unknown error'}`,
             type: 'danger',
           });
         },
